@@ -42,3 +42,13 @@ if (!Blob.prototype.arrayBuffer) {
     });
   };
 }
+
+if (typeof globalThis.DataTransfer === 'undefined') {
+  // Minimal polyfill for tests
+  // @ts-expect-error - jsdom missing DataTransfer
+  globalThis.DataTransfer = class {
+    items = { _files: [] as File[], add: function (f: File) { this._files.push(f); }, [Symbol.iterator]: function*(){ for (const f of this._files) yield { kind: 'file', type: f.type, getAsFile: () => f }; } };
+    files = [];
+    getData() { return ''; }
+  };
+}
