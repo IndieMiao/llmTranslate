@@ -13,9 +13,14 @@ initLogger();
 let mainWindow: BrowserWindow | null = null;
 
 function showMain(): void {
-  if (!mainWindow) mainWindow = createMainWindow();
+  if (!mainWindow || mainWindow.isDestroyed()) mainWindow = createMainWindow();
   if (mainWindow.isMinimized()) mainWindow.restore();
-  mainWindow.show();
+  if (!mainWindow.isVisible()) {
+    mainWindow.show();
+    // force to foreground on Windows after hide()
+    mainWindow.setAlwaysOnTop(true);
+    setTimeout(() => mainWindow?.setAlwaysOnTop(false), 100);
+  }
   mainWindow.focus();
   mainWindow.webContents.send('app:focus-input', {});
 }
@@ -37,7 +42,7 @@ app.whenReady().then(() => {
   ipcMain.on('log:error', (_e, msg: string) => logger.error('[renderer]', msg));
 
   mainWindow = createMainWindow();
-  createTray(() => mainWindow, quickTranslateClipboard);
+  createTray(showMain, quickTranslateClipboard);
 
   registerGlobalShortcut(loadSettings().shortcut, showMain);
 

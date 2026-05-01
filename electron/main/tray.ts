@@ -1,20 +1,12 @@
-import { Tray, Menu, nativeImage, BrowserWindow, app } from 'electron';
+import { Tray, Menu, nativeImage, app } from 'electron';
 import path from 'node:path';
 
 let tray: Tray | null = null;
 
-export function createTray(getMainWindow: () => BrowserWindow | null, onTranslateClipboard: () => void): Tray {
+export function createTray(showMain: () => void, onTranslateClipboard: () => void): Tray {
   const iconPath = path.join(__dirname, '..', 'assets', 'tray-icon.png');
   const icon = nativeImage.createFromPath(iconPath);
   tray = new Tray(icon.isEmpty() ? nativeImage.createEmpty() : icon);
-
-  function showMain() {
-    const w = getMainWindow();
-    if (!w) return;
-    if (w.isMinimized()) w.restore();
-    w.show();
-    w.focus();
-  }
 
   tray.on('click', showMain);
   tray.setContextMenu(Menu.buildFromTemplate([
