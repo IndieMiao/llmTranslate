@@ -1,3 +1,53 @@
-// Will be expanded in Task 12 with the typed IPC bridge.
-import { contextBridge } from 'electron';
-contextBridge.exposeInMainWorld('electron', { ready: true });
+import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron';
+import type {
+  TranslateRunPayload, TranslateChunkEvent, TranslateDoneEvent, TranslateErrorEvent,
+  Settings, HistoryListQuery, HistoryRecord,
+} from '../shared/types';
+
+const api = {
+  translate: {
+    run: (p: TranslateRunPayload): Promise<{ accepted: true }> =>
+      ipcRenderer.invoke('translate:run', p),
+    cancel: (id: string): Promise<{ cancelled: boolean }> =>
+      ipcRenderer.invoke('translate:cancel', { id }),
+    onChunk: (cb: (e: TranslateChunkEvent) => void) => {
+      const wrap = (_: IpcRendererEvent, ev: TranslateChunkEvent) => cb(ev);
+      ipcRenderer.on('translate:chunk', wrap);
+      return () => ipcRenderer.off('translate:chunk', wrap);
+    },
+    onDone: (cb: (e: TranslateDoneEvent) => void) => {
+      const wrap = (_: IpcRendererEvent, ev: TranslateDoneEvent) => cb(ev);
+      ipcRenderer.on('translate:done', wrap);
+      return () => ipcRenderer.off('translate:done', wrap);
+    },
+    onError: (cb: (e: TranslateErrorEvent) => void) => {
+      const wrap = (_: IpcRendererEvent, ev: TranslateErrorEvent) => cb(ev);
+      ipcRenderer.on('translate:error', wrap);
+      return () => ipcRenderer.off('translate:error', wrap);
+    },
+  },
+  settings: {
+    get: (): Promise<Settings> => ipcRenderer.invoke('settings:get'),
+    set: (patch: Partial<Settings>): Promise<Settings> => ipcRenderer.invoke('settings:set', patch),
+  },
+  history: {
+    list: (q: HistoryListQuery = {}): Promise<HistoryRecord[]> => ipcRenderer.invoke('history:list', q),
+    delete: (id: string) => ipcRenderer.invoke('history:delete', { id }),
+    clear: () => ipcRenderer.invoke('history:clear'),
+    favorite: (id: string, favorite: boolean) => ipcRenderer.invoke('history:favorite', { id, favorite }),
+  },
+  theme: {
+    onSystemChanged: (cb: (e: { isDark: boolean }) => void) => {
+      const wrap = (_: IpcRendererEvent, ev: { isDark: boolean }) => cb(ev);
+      ipcRenderer.on('theme:system-changed', wrap);
+      return () => ipcRenderer.off('theme:system-changed', wrap);
+    },
+  },
+  app: {
+    openLogDir: () => ipcRenderer.invoke('app:open-log-dir'),
+    showWindow: () => ipcRenderer.invoke('app:show-window'),
+  },
+};
+
+contextBridge.exposeInMainWorld('electron', api);
+export type ElectronApi = typeof api;
