@@ -3,6 +3,7 @@ import { streamTranslate, mapSdkError } from '../services/gemini';
 import { loadSettings } from '../services/secret-store';
 import { recordHistory, getAssetDir } from './history';
 import { copyAsset } from '../services/asset-store';
+import { logger } from '../logger';
 import type {
   TranslateRunPayload, TranslateChunkEvent, TranslateDoneEvent, TranslateErrorEvent, ErrorCode,
 } from '@shared/types';
@@ -76,6 +77,7 @@ async function runStream(wc: WebContents, payload: TranslateRunPayload): Promise
     send<TranslateDoneEvent>(wc, 'translate:done', { id: payload.id, fullText: result.fullText, status: 'ok', usage: result.usage });
   } catch (err) {
     const m = mapSdkError(err);
+    logger.error('translate failed', payload.id, m.code, m.detail);
     if (m.code === 'CANCELLED') {
       send<TranslateDoneEvent>(wc, 'translate:done', { id: payload.id, fullText: '', status: 'cancelled' });
     } else {

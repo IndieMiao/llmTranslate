@@ -43,6 +43,10 @@ const api = {
       return () => ipcRenderer.off('theme:system-changed', wrap);
     },
   },
+  log: {
+    warn: (msg: string) => ipcRenderer.send('log:warn', msg),
+    error: (msg: string) => ipcRenderer.send('log:error', msg),
+  },
   app: {
     openLogDir: () => ipcRenderer.invoke('app:open-log-dir'),
     showWindow: () => ipcRenderer.invoke('app:show-window'),

@@ -1,4 +1,4 @@
-import { app, BrowserWindow, nativeTheme, clipboard } from 'electron';
+import { app, BrowserWindow, nativeTheme, clipboard, ipcMain } from 'electron';
 import { createMainWindow } from './window';
 import { registerSettingsIpc } from './ipc/settings';
 import { registerHistoryIpc, startupCleanup } from './ipc/history';
@@ -6,6 +6,9 @@ import { registerTranslateIpc } from './ipc/translate';
 import { loadSettings } from './services/secret-store';
 import { createTray } from './tray';
 import { registerGlobalShortcut } from './shortcuts';
+import { initLogger, logger } from './logger';
+
+initLogger();
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -29,6 +32,9 @@ app.whenReady().then(() => {
   registerHistoryIpc();
   registerTranslateIpc();
   startupCleanup(loadSettings().history.maxRecords);
+
+  ipcMain.on('log:warn', (_e, msg: string) => logger.warn('[renderer]', msg));
+  ipcMain.on('log:error', (_e, msg: string) => logger.error('[renderer]', msg));
 
   mainWindow = createMainWindow();
   createTray(() => mainWindow, quickTranslateClipboard);
