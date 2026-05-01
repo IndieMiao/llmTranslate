@@ -45,6 +45,11 @@ vi.mock('../electron/main/ipc/history', () => ({
   getAssetDir: () => '/tmp/llmtrtest/assets',
 }));
 
+vi.mock('../electron/main/logger', () => ({
+  logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() },
+  initLogger: vi.fn(),
+}));
+
 describe('translate IPC', () => {
   beforeEach(() => { sent.length = 0; mockApiKey = 'k'; vi.clearAllMocks(); });
 
