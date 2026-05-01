@@ -1,6 +1,49 @@
 import { useEffect, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import type { HistoryRecord } from '@shared/types';
 import { ipc } from '@/lib/ipc';
+
+const mdCompact = {
+  p: (props: { children?: React.ReactNode }) => <span>{props.children}</span>,
+  strong: (props: { children?: React.ReactNode }) => (
+    <strong className="font-semibold">{props.children}</strong>
+  ),
+  em: (props: { children?: React.ReactNode }) => (
+    <em className="italic">{props.children}</em>
+  ),
+  ul: (props: { children?: React.ReactNode }) => <span>{props.children}</span>,
+  ol: (props: { children?: React.ReactNode }) => <span>{props.children}</span>,
+  li: (props: { children?: React.ReactNode }) => (
+    <span className="block before:content-['•'] before:mr-1.5">{props.children}</span>
+  ),
+  h1: (props: { children?: React.ReactNode }) => (
+    <span className="font-bold">{props.children}</span>
+  ),
+  h2: (props: { children?: React.ReactNode }) => (
+    <span className="font-bold">{props.children}</span>
+  ),
+  h3: (props: { children?: React.ReactNode }) => (
+    <span className="font-bold">{props.children}</span>
+  ),
+  blockquote: (props: { children?: React.ReactNode }) => (
+    <span className="text-muted italic">{props.children}</span>
+  ),
+  code: ({ inline, children }: { inline?: boolean; children?: React.ReactNode }) =>
+    inline === false ? (
+      <span className="text-xs font-mono">{children}</span>
+    ) : (
+      <code className="px-1 rounded bg-[color:var(--border)] font-mono text-xs">{children}</code>
+    ),
+  pre: (props: { children?: React.ReactNode }) => (
+    <span className="text-xs font-mono">{props.children}</span>
+  ),
+  a: (props: { children?: React.ReactNode }) => <span>{props.children}</span>,
+  hr: () => <span className="mx-1 text-muted">---</span>,
+  table: (props: { children?: React.ReactNode }) => <span>{props.children}</span>,
+  th: (props: { children?: React.ReactNode }) => <span className="font-semibold">{props.children}</span>,
+  td: (props: { children?: React.ReactNode }) => <span>{props.children}</span>,
+};
 
 export function HistoryList() {
   const [items, setItems] = useState<HistoryRecord[]>([]);
@@ -41,7 +84,11 @@ export function HistoryList() {
                 {r.favorite && <span className="ml-2 text-accent">★</span>}
               </div>
               {r.sourceText && <div className="text-sm text-muted line-clamp-2">{r.sourceText}</div>}
-              <div className="text-sm text-fg line-clamp-3">{r.resultText}</div>
+              <div className="text-sm text-fg max-h-16 overflow-hidden relative">
+                <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdCompact as never}>
+                  {r.resultText}
+                </ReactMarkdown>
+              </div>
               <div className="flex gap-2 text-xs">
                 <button className="text-muted hover:text-fg" onClick={() => void navigator.clipboard.writeText(r.resultText)}>复制</button>
                 <button className="text-muted hover:text-fg" onClick={async () => { await ipc().history.favorite(r.id, !r.favorite); void reload(); }}>

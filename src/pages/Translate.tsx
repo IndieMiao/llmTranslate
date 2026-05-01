@@ -81,7 +81,7 @@ export default function Translate() {
       </div>
 
       {mode === 'text' && <TextInput value={text} onChange={setText} />}
-      {mode === 'image' && <ImageInput onSelect={setFile} />}
+      {mode === 'image' && <ImageInput file={file} onSelect={setFile} />}
       {mode === 'audio' && <AudioInput onSelect={setFile} />}
 
       <div className="flex gap-2">

@@ -14,45 +14,45 @@ interface Props {
 
 const md = {
   p: (props: { children?: React.ReactNode }) => (
-    <p className="my-2 first:mt-0 last:mb-0 leading-relaxed">{props.children}</p>
+    <p className="my-3 first:mt-0 last:mb-0 leading-7 text-base">{props.children}</p>
   ),
   strong: (props: { children?: React.ReactNode }) => (
     <strong className="font-semibold text-fg">{props.children}</strong>
   ),
   em: (props: { children?: React.ReactNode }) => (
-    <em className="italic">{props.children}</em>
+    <em className="italic text-fg">{props.children}</em>
   ),
   ul: (props: { children?: React.ReactNode }) => (
-    <ul className="list-disc list-outside pl-6 my-2 space-y-1">{props.children}</ul>
+    <ul className="list-disc list-outside pl-6 my-3 space-y-2">{props.children}</ul>
   ),
   ol: (props: { children?: React.ReactNode }) => (
-    <ol className="list-decimal list-outside pl-6 my-2 space-y-1">{props.children}</ol>
+    <ol className="list-decimal list-outside pl-6 my-3 space-y-2">{props.children}</ol>
   ),
   li: (props: { children?: React.ReactNode }) => (
-    <li className="leading-relaxed">{props.children}</li>
+    <li className="leading-7 text-base pl-1">{props.children}</li>
   ),
   h1: (props: { children?: React.ReactNode }) => (
-    <h1 className="text-xl font-semibold mt-3 mb-2 text-fg">{props.children}</h1>
+    <h1 className="text-xl font-bold mt-5 mb-3 text-fg leading-8">{props.children}</h1>
   ),
   h2: (props: { children?: React.ReactNode }) => (
-    <h2 className="text-lg font-semibold mt-3 mb-2 text-fg">{props.children}</h2>
+    <h2 className="text-lg font-bold mt-4 mb-2 text-fg leading-7">{props.children}</h2>
   ),
   h3: (props: { children?: React.ReactNode }) => (
-    <h3 className="text-base font-semibold mt-2 mb-1 text-fg">{props.children}</h3>
+    <h3 className="text-base font-bold mt-3 mb-1.5 text-fg leading-7">{props.children}</h3>
   ),
   blockquote: (props: { children?: React.ReactNode }) => (
-    <blockquote className="border-l-2 border-accent pl-3 my-2 text-muted">{props.children}</blockquote>
+    <blockquote className="border-l-[3px] border-accent pl-4 py-1 my-3 text-muted italic leading-7">{props.children}</blockquote>
   ),
   code: ({ inline, children }: { inline?: boolean; children?: React.ReactNode }) =>
     inline === false ? (
       <code className="block">{children}</code>
     ) : (
-      <code className="px-1.5 py-0.5 rounded bg-[color:var(--border)] text-fg font-mono text-[0.85em]">
+      <code className="px-1.5 py-0.5 rounded bg-[color:var(--border)] text-fg font-mono text-sm">
         {children}
       </code>
     ),
   pre: (props: { children?: React.ReactNode }) => (
-    <pre className="my-2 p-3 rounded-md bg-[color:var(--border)] overflow-x-auto text-xs font-mono leading-relaxed">
+    <pre className="my-3 p-4 rounded-lg bg-[color:var(--border)] overflow-x-auto text-sm font-mono leading-6">
       {props.children}
     </pre>
   ),
@@ -61,23 +61,23 @@ const md = {
       {props.children}
     </a>
   ),
-  hr: () => <hr className="my-3 border-border" />,
+  hr: () => <hr className="my-4 border-border" />,
   table: (props: { children?: React.ReactNode }) => (
-    <div className="overflow-x-auto my-2">
-      <table className="border-collapse text-sm">{props.children}</table>
+    <div className="overflow-x-auto my-3 rounded-lg border border-border">
+      <table className="w-full border-collapse text-sm">{props.children}</table>
     </div>
   ),
   th: (props: { children?: React.ReactNode }) => (
-    <th className="border border-border px-2 py-1 text-left font-semibold">{props.children}</th>
+    <th className="border border-border px-3 py-2 text-left font-semibold bg-[color:var(--border)] text-fg">{props.children}</th>
   ),
   td: (props: { children?: React.ReactNode }) => (
-    <td className="border border-border px-2 py-1">{props.children}</td>
+    <td className="border border-border px-3 py-2">{props.children}</td>
   ),
 };
 
 export function TranslationView({ text, status, errorMessage, onCopy, onFavorite, onRetranslate }: Props) {
   return (
-    <div className="border border-border rounded-md p-4 min-h-[120px] flex flex-col gap-2">
+    <div className="border border-border rounded-lg p-5 min-h-[120px] flex flex-col gap-2">
       {status === 'error' ? (
         <div className="text-danger text-sm">{errorMessage}</div>
       ) : (
@@ -97,14 +97,14 @@ export function TranslationView({ text, status, errorMessage, onCopy, onFavorite
         </div>
       )}
       {status === 'ok' && (
-        <div className="flex gap-2 mt-1">
-          <button className="text-xs text-muted hover:text-fg" onClick={onCopy}>
+        <div className="flex gap-3 mt-2 pt-2 border-t border-border">
+          <button className="text-xs text-muted hover:text-fg transition-colors" onClick={onCopy}>
             复制
           </button>
-          <button className="text-xs text-muted hover:text-fg" onClick={onFavorite}>
+          <button className="text-xs text-muted hover:text-fg transition-colors" onClick={onFavorite}>
             收藏
           </button>
-          <button className="text-xs text-muted hover:text-fg" onClick={onRetranslate}>
+          <button className="text-xs text-muted hover:text-fg transition-colors" onClick={onRetranslate}>
             重新翻译
           </button>
         </div>
