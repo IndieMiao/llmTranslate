@@ -8,3 +8,6 @@ out
 .DS_Store
 electron-builder-output
 release
+.claude/settings.local.json
+test-results/.last-run.json
+memo.md
