@@ -1,0 +1,10 @@
+node_modules
+dist
+dist-electron
+out
+.vite
+*.local
+*.log
+.DS_Store
+electron-builder-output
+release
