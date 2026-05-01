@@ -1,0 +1,23 @@
+name: ci
+on:
+  push: { branches: [main, master] }
+  pull_request:
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20', cache: 'npm' }
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run test
+      - run: npm run e2e
+      - if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        run: npm run package
+      - if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        uses: actions/upload-artifact@v4
+        with:
+          name: llmTranslate-windows
+          path: release/*.exe

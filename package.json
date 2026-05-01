@@ -1,10 +1,13 @@
 {
   "name": "llm-translate",
   "version": "0.1.0",
+  "description": "A desktop translation app powered by LLM (Google Gemini)",
+  "author": "zhangshaojie <zsjasper@gmail.com>",
   "private": true,
   "type": "module",
   "main": "dist-electron/index.js",
   "scripts": {
+    "postinstall": "electron-builder install-app-deps",
     "dev": "vite",
     "build": "tsc -p tsconfig.json && tsc -p electron/tsconfig.json && vite build",
     "lint": "eslint . --ext .ts,.tsx",

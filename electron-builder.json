@@ -1,0 +1,24 @@
+{
+  "appId": "com.zhangshaojie.llmtranslate",
+  "productName": "llmTranslate",
+  "directories": { "output": "release" },
+  "files": [
+    "dist/**",
+    "dist-electron/**",
+    "assets/**",
+    "package.json"
+  ],
+  "win": {
+    "target": [
+      { "target": "nsis", "arch": ["x64"] },
+      { "target": "portable", "arch": ["x64"] }
+    ],
+    "icon": "assets/tray-icon.png",
+    "signAndEditExecutable": false
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "perMachine": false
+  }
+}
