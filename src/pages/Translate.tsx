@@ -27,6 +27,16 @@ export default function Translate() {
   }, []);
 
   useEffect(() => {
+    const off1 = window.electron.app.onFocusInput(() => {
+      document.querySelector<HTMLTextAreaElement>('textarea')?.focus();
+    });
+    const off2 = window.electron.app.onQuickTranslate(({ text }) => {
+      setMode('text'); setText(text);
+    });
+    return () => { off1(); off2(); };
+  }, []);
+
+  useEffect(() => {
     if (t.status === 'error') showErrorByCode(t.errorCode, t.errorMessage ?? '错误');
   }, [t.status, t.errorCode, t.errorMessage]);
 

@@ -46,6 +46,16 @@ const api = {
   app: {
     openLogDir: () => ipcRenderer.invoke('app:open-log-dir'),
     showWindow: () => ipcRenderer.invoke('app:show-window'),
+    onFocusInput: (cb: () => void) => {
+      const wrap = () => cb();
+      ipcRenderer.on('app:focus-input', wrap);
+      return () => ipcRenderer.off('app:focus-input', wrap);
+    },
+    onQuickTranslate: (cb: (e: { text: string }) => void) => {
+      const wrap = (_: IpcRendererEvent, ev: { text: string }) => cb(ev);
+      ipcRenderer.on('app:quick-translate', wrap);
+      return () => ipcRenderer.off('app:quick-translate', wrap);
+    },
   },
 };
 
