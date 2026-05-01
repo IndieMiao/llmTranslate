@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron';
 import type {
   TranslateRunPayload, TranslateChunkEvent, TranslateDoneEvent, TranslateErrorEvent,
-  Settings, HistoryListQuery, HistoryRecord,
+  Settings, HistoryListQuery, HistoryRecord, HistoryAssetReadResult,
 } from '../shared/types';
 
 const api = {
@@ -35,6 +35,8 @@ const api = {
     delete: (id: string) => ipcRenderer.invoke('history:delete', { id }),
     clear: () => ipcRenderer.invoke('history:clear'),
     favorite: (id: string, favorite: boolean) => ipcRenderer.invoke('history:favorite', { id, favorite }),
+    readAsset: (id: string): Promise<HistoryAssetReadResult | null> =>
+      ipcRenderer.invoke('history:read-asset', { id }),
   },
   theme: {
     onSystemChanged: (cb: (e: { isDark: boolean }) => void) => {
