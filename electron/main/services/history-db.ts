@@ -47,6 +47,7 @@ export interface HistoryDb {
   setFavorite(id: string, favorite: boolean): void;
   cleanupCapacity(maxNonFavorites: number): void;
   listAllAssetPaths(): string[];
+  getAssetById(id: string): { assetPath: string | null; mode: HistoryRecord['mode'] } | null;
   integrityOk(): boolean;
   close(): void;
 }
@@ -152,6 +153,13 @@ export function openHistoryDb(filePath: string): HistoryDb {
     listAllAssetPaths() {
       return (db.prepare('SELECT asset_path FROM translations WHERE asset_path IS NOT NULL').all() as { asset_path: string }[])
         .map((r) => r.asset_path);
+    },
+    getAssetById(id) {
+      const row = db
+        .prepare('SELECT asset_path, mode FROM translations WHERE id = ?')
+        .get(id) as { asset_path: string | null; mode: string } | undefined;
+      if (!row) return null;
+      return { assetPath: row.asset_path, mode: row.mode as HistoryRecord['mode'] };
     },
     integrityOk() {
       const r = db.prepare('PRAGMA integrity_check').get() as { integrity_check: string };

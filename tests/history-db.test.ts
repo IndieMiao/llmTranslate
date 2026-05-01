@@ -73,4 +73,13 @@ describe('history-db', () => {
   it('integrity check passes for fresh db', () => {
     expect(db.integrityOk()).toBe(true);
   });
+
+  it('getAssetById returns asset_path and mode for the record', () => {
+    db.insert(rec({ id: 'r1', mode: 'image', assetPath: '/tmp/x.png' }));
+    expect(db.getAssetById('r1')).toEqual({ assetPath: '/tmp/x.png', mode: 'image' });
+  });
+
+  it('getAssetById returns null for unknown id', () => {
+    expect(db.getAssetById('missing')).toBeNull();
+  });
 });
