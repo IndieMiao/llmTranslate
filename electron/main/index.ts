@@ -1,11 +1,15 @@
 import { app, BrowserWindow } from 'electron';
 import { createMainWindow } from './window';
 import { registerSettingsIpc } from './ipc/settings';
+import { registerHistoryIpc, startupCleanup } from './ipc/history';
+import { loadSettings } from './services/secret-store';
 
 let mainWindow: BrowserWindow | null = null;
 
 app.whenReady().then(() => {
   registerSettingsIpc();
+  registerHistoryIpc();
+  startupCleanup(loadSettings().history.maxRecords);
   mainWindow = createMainWindow();
 });
 
