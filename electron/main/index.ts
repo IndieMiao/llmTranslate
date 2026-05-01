@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, nativeTheme } from 'electron';
 import { createMainWindow } from './window';
 import { registerSettingsIpc } from './ipc/settings';
 import { registerHistoryIpc, startupCleanup } from './ipc/history';
@@ -12,7 +12,14 @@ app.whenReady().then(() => {
   registerHistoryIpc();
   registerTranslateIpc();
   startupCleanup(loadSettings().history.maxRecords);
+
   mainWindow = createMainWindow();
+
+  nativeTheme.on('updated', () => {
+    for (const w of BrowserWindow.getAllWindows()) {
+      w.webContents.send('theme:system-changed', { isDark: nativeTheme.shouldUseDarkColors });
+    }
+  });
 });
 
 app.on('window-all-closed', () => {
