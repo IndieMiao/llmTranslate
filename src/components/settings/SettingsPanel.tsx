@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import type { Settings, ThemeChoice } from '@shared/types';
 import { ipc } from '@/lib/ipc';
 import { pushToast } from '@/components/ui/Toast';
+import { applyTheme } from '@/lib/theme';
 
 function maskKey(k: string): string {
   if (!k) return '未设置';
@@ -56,7 +57,11 @@ export function SettingsPanel() {
           {(['dark', 'light', 'system'] as ThemeChoice[]).map((t) => (
             <button key={t}
               className={`px-3 h-9 rounded-md border ${s.theme === t ? 'border-accent text-fg' : 'border-border text-muted'}`}
-              onClick={() => void update({ theme: t })}
+              onClick={() => {
+                void update({ theme: t });
+                // Apply immediately so the renderer reflects the change without waiting for IPC round-trip
+                if (t !== 'system') applyTheme(t);
+              }}
             >
               {t === 'dark' ? '暗色' : t === 'light' ? '亮色' : '跟随系统'}
             </button>

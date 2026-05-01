@@ -71,6 +71,17 @@ export interface StreamResult {
 }
 
 export async function streamTranslate(opts: StreamTranslateOptions): Promise<StreamResult> {
+  if (process.env['NODE_ENV'] === 'test') {
+    const chunks = ['hel', 'lo ', 'world'];
+    let full = '';
+    for (const c of chunks) {
+      if (opts.signal.aborted) throw Object.assign(new Error('abort'), { name: 'AbortError' });
+      full += c;
+      opts.onChunk(c);
+      await new Promise((r) => setTimeout(r, 30));
+    }
+    return { fullText: full };
+  }
   const ai = new GoogleGenAI({ apiKey: opts.apiKey });
   const stream = await ai.models.generateContentStream({
     model: opts.model,

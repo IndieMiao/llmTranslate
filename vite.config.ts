@@ -13,8 +13,44 @@ export default defineConfig({
   plugins: [
     react(),
     electron({
-      main: { entry: 'electron/main/index.ts' },
-      preload: { input: 'electron/preload.ts' },
+      main: {
+        entry: 'electron/main/index.ts',
+        vite: {
+          resolve: {
+            alias: {
+              '@shared': path.resolve(__dirname, 'shared'),
+            },
+          },
+          build: {
+            rollupOptions: {
+              external: ['better-sqlite3', 'electron-store', 'electron-log'],
+            },
+          },
+          plugins: [
+            {
+              name: 'inject-esm-dirname',
+              renderChunk(code: string) {
+                const banner = `import { fileURLToPath as __fileURLToPath } from 'node:url';
+import { dirname as __dirname_fn } from 'node:path';
+const __filename = __fileURLToPath(import.meta.url);
+const __dirname = __dirname_fn(__filename);
+`;
+                return { code: banner + code, map: null };
+              },
+            },
+          ],
+        },
+      },
+      preload: {
+        input: 'electron/preload.ts',
+        vite: {
+          resolve: {
+            alias: {
+              '@shared': path.resolve(__dirname, 'shared'),
+            },
+          },
+        },
+      },
       renderer: {},
     }),
   ],
