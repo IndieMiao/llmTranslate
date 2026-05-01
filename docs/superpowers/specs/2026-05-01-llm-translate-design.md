@@ -195,16 +195,18 @@ renderer                                  main
 
 ### 4.3 IPC 通道清单
 
-| 通道 | 方向 | payload | 用途 |
+| 通道 | 方向 | payload | 返回 / 用途 |
 |---|---|---|---|
-| `translate:run` | renderer→main (invoke) | `{id, mode, sourceLang, targetLang, text?, bytes?, mime?}` | 启动流 |
-| `translate:cancel` | renderer→main (invoke) | `{id}` | 中止流 |
+| `translate:run` | renderer→main (invoke) | `{id, mode, sourceLang, targetLang, text?, bytes?, mime?}` | resolves `{ accepted: true }` 表示请求被接收并已开始；同步校验失败（无 API key / payload 非法）时 reject 并附 `code` |
+| `translate:cancel` | renderer→main (invoke) | `{id}` | resolves `{ cancelled: boolean }` |
 | `translate:chunk` | main→renderer (send) | `{id, delta}` | 流式 token |
 | `translate:done` | main→renderer (send) | `{id, fullText, usage, status: 'ok' \| 'cancelled'}` | 收尾 |
-| `translate:error` | main→renderer (send) | `{id, code, message, detail?}` | 错误（见 §6）|
+| `translate:error` | main→renderer (send) | `{id, code, message, detail?}` | 流过程中（已 accepted 之后）的运行时错误（见 §6）|
 | `settings:get` / `settings:set` | invoke | — / `Partial<Settings>` | 设置读写 |
 | `history:list` / `:search` / `:delete` / `:clear` / `:favorite` | invoke | — | 历史 CRUD |
 | `theme:system-changed` | main→renderer (send) | `{isDark}` | 跟随系统时同步 |
+
+**错误传递分工**：`translate:run` 同步可知的错误（payload 校验、API key 缺失）以 invoke reject 形式返回，便于 renderer 在 await 处直接捕获；流启动后才出现的运行时错误（401/429/网络/safety/cancel）一律走 `translate:error` 事件，与 chunk/done 同通道。
 
 ## 5. 存储与安全
 
@@ -275,9 +277,10 @@ CREATE VIRTUAL TABLE translations_fts USING fts5(
 图/音不入 SQLite blob。落到 `%APPDATA%\llmTranslate\assets\YYYY\MM\<id>.<ext>`。
 
 容量管理：
-- 总记录数 > `history.maxRecords` → 删最旧的 **非收藏** 记录及其资产
-- 启动时跑一次清理；每次新增也跑一次（轻量）
-- 设置里"清空历史"按钮带二次确认，会同时清掉 assets
+- "总记录数"指 **非收藏** 记录数。仅当非收藏数 > `history.maxRecords` 时，按 `created_at` 升序删除最旧的非收藏记录及其资产。
+- 收藏记录不计入 cap，也不会被自动清理 —— 收藏即"显式持久"。"清空历史"按钮才会一并清掉收藏（带二次确认）。
+- 启动时跑一次清理；每次新增也跑一次（轻量）。
+- 设置里"清空历史"按钮带二次确认，会同时清掉 assets。
 
 ### 5.5 渲染端安全
 
