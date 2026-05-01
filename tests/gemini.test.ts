@@ -52,12 +52,14 @@ describe('gemini.buildContents', () => {
   it('image mode produces inlineData + instruction', () => {
     const bytes = new Uint8Array([1, 2, 3]);
     const c = buildContents({ id: 'x', mode: 'image', sourceLang: 'zh', targetLang: 'en', bytes, mime: 'image/png' });
-    expect(c[0].parts[0]).toMatchObject({ inlineData: { mimeType: 'image/png' } });
-    expect(c[0].parts[1]).toHaveProperty('text');
+    const parts = c[0]!.parts;
+    expect(parts[0]).toMatchObject({ inlineData: { mimeType: 'image/png' } });
+    expect(parts[1]).toHaveProperty('text');
   });
   it('audio mode produces inlineData + transcribe-and-translate text', () => {
     const c = buildContents({ id: 'x', mode: 'audio', sourceLang: 'zh', targetLang: 'en', bytes: new Uint8Array(2), mime: 'audio/mp3' });
-    expect(c[0].parts[0]).toMatchObject({ inlineData: { mimeType: 'audio/mp3' } });
-    expect((c[0].parts[1] as { text: string }).text).toMatch(/transcribe/i);
+    const parts = c[0]!.parts;
+    expect(parts[0]).toMatchObject({ inlineData: { mimeType: 'audio/mp3' } });
+    expect((parts[1] as { text: string }).text).toMatch(/transcribe/i);
   });
 });
