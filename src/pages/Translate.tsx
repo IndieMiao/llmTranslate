@@ -74,7 +74,7 @@ export default function Translate() {
   });
 
   return (
-    <div className="p-6 flex flex-col gap-3 h-full overflow-auto">
+    <div className="px-6 pt-6 pb-32 flex flex-col gap-3 h-full overflow-auto">
       <div className="flex gap-3 items-center">
         <LangSwitch source={src} target={tgt} onChange={onLangChange} />
         <ModeTabs current={mode} onChange={setMode} />
