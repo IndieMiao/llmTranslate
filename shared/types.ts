@@ -93,6 +93,11 @@ export interface HistoryListQuery {
   offset?: number;
 }
 
+export interface HistoryAssetReadResult {
+  mime: string;
+  dataUrl: string; // "data:<mime>;base64,..."
+}
+
 // ----- File limits -----
 export const FILE_LIMITS = {
   imageMaxBytes: 10 * 1024 * 1024,
