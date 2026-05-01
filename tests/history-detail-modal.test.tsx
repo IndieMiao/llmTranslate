@@ -12,15 +12,15 @@ beforeEach(() => {
   readAssetMock.mockReset();
   favoriteMock.mockClear();
   deleteMock.mockClear();
-  // @ts-expect-error stub
-  window.electron = {
-    history: {
-      favorite: favoriteMock,
-      delete: deleteMock,
-      readAsset: readAssetMock,
+  Object.assign(window, {
+    electron: {
+      history: {
+        favorite: favoriteMock,
+        delete: deleteMock,
+        readAsset: readAssetMock,
+      },
     },
-  };
-  // @ts-expect-error stub
+  });
   Object.assign(navigator, { clipboard: { writeText: vi.fn() } });
   vi.spyOn(window, 'confirm').mockReturnValue(true);
 });

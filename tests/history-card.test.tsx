@@ -10,14 +10,14 @@ const deleteMock = vi.fn(async () => ({ ok: true }));
 beforeEach(() => {
   favoriteMock.mockClear();
   deleteMock.mockClear();
-  // @ts-expect-error stub global
-  window.electron = {
-    history: {
-      favorite: favoriteMock,
-      delete: deleteMock,
+  Object.assign(window, {
+    electron: {
+      history: {
+        favorite: favoriteMock,
+        delete: deleteMock,
+      },
     },
-  };
-  // @ts-expect-error stub clipboard
+  });
   Object.assign(navigator, { clipboard: { writeText: vi.fn() } });
   vi.spyOn(window, 'confirm').mockReturnValue(true);
 });
@@ -62,7 +62,7 @@ describe('HistoryCard', () => {
     render(<HistoryCard record={rec()} onOpen={onOpen} onChanged={vi.fn()} />);
     await userEvent.click(screen.getByTestId('history-card-body'));
     expect(onOpen).toHaveBeenCalledTimes(1);
-    expect(onOpen.mock.calls[0][0].id).toBe('r1');
+    expect(onOpen).toHaveBeenCalledWith(expect.objectContaining({ id: 'r1' }));
   });
 
   it('clicking footer buttons does not call onOpen', async () => {
