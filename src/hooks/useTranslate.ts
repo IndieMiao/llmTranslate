@@ -64,5 +64,13 @@ export function useTranslate() {
     if (lastArgs.current) await run(lastArgs.current);
   }, [run]);
 
-  return { id, text, status, errorMessage, errorCode, run, cancel, retry };
+  const reset = useCallback(() => {
+    setId(null);
+    setText('');
+    setStatus('idle');
+    setErrorMessage(undefined);
+    setErrorCode(undefined);
+  }, []);
+
+  return { id, text, status, errorMessage, errorCode, run, cancel, retry, reset };
 }

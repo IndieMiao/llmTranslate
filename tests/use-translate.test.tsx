@@ -38,4 +38,29 @@ describe('useTranslate', () => {
     expect(result.current.status).toBe('error');
     expect(result.current.errorMessage).toBe('网络异常');
   });
+
+  it('reset clears text, status, error, and id', async () => {
+    const { result } = renderHook(() => useTranslate());
+    await act(async () => { await result.current.run({ mode: 'text', sourceLang: 'zh', targetLang: 'en', text: 'x' }); });
+    act(() => { chunkCb!({ id: result.current.id!, delta: 'partial' }); });
+    expect(result.current.text).toBe('partial');
+    expect(result.current.status).toBe('streaming');
+
+    act(() => { result.current.reset(); });
+
+    expect(result.current.text).toBe('');
+    expect(result.current.status).toBe('idle');
+    expect(result.current.errorMessage).toBeUndefined();
+    expect(result.current.errorCode).toBeUndefined();
+    expect(result.current.id).toBeNull();
+  });
+
+  it('chunks arriving after reset are ignored', async () => {
+    const { result } = renderHook(() => useTranslate());
+    await act(async () => { await result.current.run({ mode: 'text', sourceLang: 'zh', targetLang: 'en', text: 'x' }); });
+    const oldId = result.current.id!;
+    act(() => { result.current.reset(); });
+    act(() => { chunkCb!({ id: oldId, delta: 'late chunk' }); });
+    expect(result.current.text).toBe('');
+  });
 });

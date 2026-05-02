@@ -5,7 +5,7 @@ import { TextInput } from '@/components/translate/TextInput';
 import { ImageInput, type SelectedFile } from '@/components/translate/ImageInput';
 import { AudioInput } from '@/components/translate/AudioInput';
 import { TranslationView } from '@/components/translate/TranslationView';
-import { useTranslate } from '@/hooks/useTranslate';
+import { useTranslateContext } from '@/hooks/TranslateContext';
 import { usePaste } from '@/hooks/usePaste';
 import { showErrorByCode } from '@/hooks/useErrorHandler';
 import { ipc } from '@/lib/ipc';
@@ -17,7 +17,7 @@ export default function Translate() {
   const [tgt, setTgt] = useState<LangCode>('en');
   const [text, setText] = useState('');
   const [file, setFile] = useState<SelectedFile | null>(null);
-  const t = useTranslate();
+  const t = useTranslateContext();
 
   useEffect(() => {
     void ipc().settings.get().then((s) => {
@@ -94,7 +94,12 @@ export default function Translate() {
         </button>
         <button
           className="px-4 h-9 rounded-md border border-border text-fg"
-          onClick={() => { setText(''); setFile(null); }}
+          onClick={async () => {
+            if (t.status === 'streaming') await t.cancel();
+            t.reset();
+            setText('');
+            setFile(null);
+          }}
         >
           清空
         </button>
