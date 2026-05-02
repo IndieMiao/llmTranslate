@@ -56,7 +56,7 @@ export type ThemeChoice = 'dark' | 'light' | 'system';
 
 export interface Settings {
   apiKey: string;          // empty string when unset
-  model: string;           // gemini-2.0-flash default
+  model: string;           // gemini-3.0-flash default
   theme: ThemeChoice;
   shortcut: string;        // e.g. 'Ctrl+Shift+T'
   languagePair: LangPair;  // current direction
@@ -65,7 +65,7 @@ export interface Settings {
 
 export const DEFAULT_SETTINGS: Settings = {
   apiKey: '',
-  model: 'gemini-2.0-flash',
+  model: 'gemini-3.0-flash',
   theme: 'system',
   shortcut: 'Ctrl+Shift+T',
   languagePair: 'zh-en',
