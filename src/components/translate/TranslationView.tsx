@@ -14,8 +14,10 @@ interface Props {
 }
 
 export function TranslationView({ text, status, errorMessage, onCopy, onFavorite, onRetranslate }: Props) {
+  const empty = status === 'idle' && !text && !errorMessage;
+  if (empty) return null;
   return (
-    <div className="border border-border rounded-lg p-5 min-h-[120px] flex flex-col gap-2">
+    <div className="border border-border rounded-lg p-5 flex flex-col gap-2">
       {status === 'error' ? (
         <div className="text-danger text-sm">{errorMessage}</div>
       ) : (

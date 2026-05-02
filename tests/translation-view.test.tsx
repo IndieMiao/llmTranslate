@@ -23,4 +23,16 @@ describe('TranslationView', () => {
     render(<TranslationView text="hel" status="cancelled" onCopy={vi.fn()} onFavorite={vi.fn()} onRetranslate={vi.fn()} />);
     expect(screen.getByText(/已取消/)).toBeInTheDocument();
   });
+
+  it('renders nothing when status=idle and no text and no error', () => {
+    const { container } = render(
+      <TranslationView text="" status="idle" onCopy={vi.fn()} onFavorite={vi.fn()} onRetranslate={vi.fn()} />,
+    );
+    expect(container.firstChild).toBeNull();
+  });
+
+  it('renders the box when idle but text is non-empty (e.g. after a finished stream pre-status switch)', () => {
+    render(<TranslationView text="hello" status="idle" onCopy={vi.fn()} onFavorite={vi.fn()} onRetranslate={vi.fn()} />);
+    expect(screen.getByText('hello')).toBeInTheDocument();
+  });
 });
